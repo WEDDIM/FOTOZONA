@@ -1,0 +1,833 @@
+--- uxp-plugin/index.html (原始)
+
+
++++ uxp-plugin/index.html (修改后)
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    /* Spectrum UXP Base Styles */
+    :root {
+      --bg-primary: #2b2b2b;
+      --bg-secondary: #3a3a3a;
+      --bg-tertiary: #444444;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --text-disabled: #666666;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --border: #555555;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Adobe Clean", "Segoe UI", sans-serif;
+      font-size: 11px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #777; }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1a1a, #2b2b2b);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-logo {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .header-title {
+      font-size: 13px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #f59e0b, #fb923c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-version {
+      font-size: 9px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab {
+      flex: 1;
+      min-width: 60px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 10px;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tab:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .tab-icon { font-size: 14px; }
+
+    /* Content */
+    .content {
+      padding: 10px;
+      overflow-y: auto;
+      max-height: calc(100vh - 140px);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Section */
+    .section {
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .section-title i { color: var(--accent); font-size: 10px; }
+
+    /* Slider */
+    .slider-group {
+      margin-bottom: 8px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .slider-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .slider-value {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 24px;
+      text-align: right;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid var(--bg-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+    }
+
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { background: #555; }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Presets */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .preset-btn {
+      padding: 4px 8px;
+      font-size: 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    /* Generative AI Section */
+    .ai-card {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(234, 88, 12, 0.05));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .ai-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ai-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    /* Status */
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      padding: 4px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      color: var(--text-secondary);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .status-dot.processing {
+      background: var(--warning);
+      animation: pulse 1s infinite;
+    }
+
+    .status-dot.error {
+      background: var(--error);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Progress */
+    .progress-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #fb923c);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 11px;
+      z-index: 1000;
+      transition: transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+
+    /* Checkbox */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    /* Textarea */
+    textarea {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 6px 8px;
+      font-size: 11px;
+      resize: vertical;
+      min-height: 50px;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Select */
+    select {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+
+    select:focus { outline: none; border-color: var(--accent); }
+
+    /* Info badge */
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">Ф</div>
+    <span class="header-title">Фотозона Pro</span>
+    <span class="header-version">v2.0</span>
+    <span class="info-badge"><i class="fas fa-bolt"></i> AI</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="skin">
+      <span class="tab-icon">✨</span>
+      <span>Кожа</span>
+    </div>
+    <div class="tab" data-tab="face">
+      <span class="tab-icon">😊</span>
+      <span>Лицо</span>
+    </div>
+    <div class="tab" data-tab="ai">
+      <span class="tab-icon">🤖</span>
+      <span>AI</span>
+    </div>
+    <div class="tab" data-tab="color">
+      <span class="tab-icon">🎨</span>
+      <span>Цвет</span>
+    </div>
+    <div class="tab" data-tab="tools">
+      <span class="tab-icon">🔧</span>
+      <span>Инструменты</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- SKIN TAB -->
+    <div class="tab-content active" id="tab-skin">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-hand-sparkles"></i> Ретушь кожи</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Сглаживание</span>
+            <span class="slider-value" id="val-smooth">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-smooth" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Частотное разделение</span>
+            <span class="slider-value" id="val-freq">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-freq" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Тон кожи</span>
+            <span class="slider-value" id="val-tone">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-tone" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Дефекты</span>
+            <span class="slider-value" id="val-blemish">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-blemish" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Поры</span>
+            <span class="slider-value" id="val-pores">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-pores" />
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fas fa-magic"></i> Пресеты</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="skin-light">Лёгкая</button>
+          <button class="preset-btn" data-preset="skin-medium">Средняя</button>
+          <button class="preset-btn" data-preset="skin-studio">Студийная</button>
+          <button class="preset-btn" data-preset="skin-portrait">Портрет</button>
+          <button class="preset-btn" data-preset="skin-beauty">Бьюти</button>
+          <button class="preset-btn" data-preset="skin-natural">Натуральная</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btn-apply-skin">
+        <i class="fas fa-play"></i> Применить к слою
+      </button>
+    </div>
+
+    <!-- FACE TAB -->
+    <div class="tab-content" id="tab-face">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-face-smile"></i> Коррекция лица</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Dodge & Burn</span>
+            <span class="slider-value" id="val-dodge">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-dodge" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Отбеливание зубов</span>
+            <span class="slider-value" id="val-teeth">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-teeth" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Усиление глаз</span>
+            <span class="slider-value" id="val-eyes">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-eyes" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Скульптурирование</span>
+            <span class="slider-value" id="val-sculpt">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-sculpt" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Устранение теней</span>
+            <span class="slider-value" id="val-shadows">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-shadows" />
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fas fa-magic"></i> Пресеты</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="face-natural">Натуральный</button>
+          <button class="preset-btn" data-preset="face-glamour">Гламур</button>
+          <button class="preset-btn" data-preset="face-model">Модельный</button>
+          <button class="preset-btn" data-preset="face-editorial">Журнальный</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btn-apply-face">
+        <i class="fas fa-play"></i> Применить к слою
+      </button>
+    </div>
+
+    <!-- AI TAB -->
+    <div class="tab-content" id="tab-ai">
+      <div class="ai-card">
+        <div class="ai-title"><i class="fas fa-wand-magic-sparkles"></i> Генеративное заполнение</div>
+        <div class="ai-desc">Опишите, что нужно добавить или изменить в выделенной области</div>
+        <textarea id="ai-prompt" placeholder="Например: добавь цветы на фон, убери провода..."></textarea>
+        <div style="margin-top: 6px; display: flex; gap: 4px;">
+          <select id="ai-style" style="flex: 1;">
+            <option value="auto">Авто-стиль</option>
+            <option value="photo">Фото</option>
+            <option value="art">Арт</option>
+            <option value="illustration">Иллюстрация</option>
+            <option value="3d">3D рендер</option>
+          </select>
+          <select id="ai-quality" style="flex: 1;">
+            <option value="standard">Стандарт</option>
+            <option value="high">Высокое</option>
+            <option value="ultra">Ультра</option>
+          </select>
+        </div>
+        <button class="btn btn-success btn-block" style="margin-top: 8px;" id="btn-ai-generate">
+          <i class="fas fa-wand-magic-sparkles"></i> Генерировать
+        </button>
+      </div>
+
+      <div class="ai-card">
+        <div class="ai-title"><i class="fas fa-expand"></i> Генеративное расширение</div>
+        <div class="ai-desc">Расширить изображение за пределы кадра с помощью AI</div>
+        <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+          <div class="slider-group" style="flex: 1; margin: 0;">
+            <div class="slider-header">
+              <span class="slider-label">Слева</span>
+              <span class="slider-value" id="val-ext-l">0</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" id="slider-ext-l" />
+          </div>
+          <div class="slider-group" style="flex: 1; margin: 0;">
+            <div class="slider-header">
+              <span class="slider-label">Справа</span>
+              <span class="slider-value" id="val-ext-r">0</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" id="slider-ext-r" />
+          </div>
+        </div>
+        <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+          <div class="slider-group" style="flex: 1; margin: 0;">
+            <div class="slider-header">
+              <span class="slider-label">Сверху</span>
+              <span class="slider-value" id="val-ext-t">0</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" id="slider-ext-t" />
+          </div>
+          <div class="slider-group" style="flex: 1; margin: 0;">
+            <div class="slider-header">
+              <span class="slider-label">Снизу</span>
+              <span class="slider-value" id="val-ext-b">0</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" id="slider-ext-b" />
+          </div>
+        </div>
+        <button class="btn btn-success btn-block" id="btn-ai-expand">
+          <i class="fas fa-expand"></i> Расширить
+        </button>
+      </div>
+
+      <div class="ai-card">
+        <div class="ai-title"><i class="fas fa-eraser"></i> Генеративное удаление</div>
+        <div class="ai-desc">Удалить объекты из выделенной области с помощью AI</div>
+        <label class="checkbox-group">
+          <input type="checkbox" id="ai-smart-detect" checked />
+          <span>Авто-определение объектов</span>
+        </label>
+        <button class="btn btn-primary btn-block" id="btn-ai-remove">
+          <i class="fas fa-eraser"></i> Удалить объект
+        </button>
+      </div>
+    </div>
+
+    <!-- COLOR TAB -->
+    <div class="tab-content" id="tab-color">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-palette"></i> Цветокоррекция</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Яркость</span>
+            <span class="slider-value" id="val-bright">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-bright" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Контраст</span>
+            <span class="slider-value" id="val-contrast">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-contrast" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Насыщенность</span>
+            <span class="slider-value" id="val-sat">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-sat" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Температура</span>
+            <span class="slider-value" id="val-temp">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-temp" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Тень</span>
+            <span class="slider-value" id="val-shadow">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-shadow" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Света</span>
+            <span class="slider-value" id="val-highlight">0</span>
+          </div>
+          <input type="range" min="-50" max="50" value="0" id="slider-highlight" />
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fas fa-film"></i> LUT Пресеты</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="lut-cinema">Кино</button>
+          <button class="preset-btn" data-preset="lut-vintage">Винтаж</button>
+          <button class="preset-btn" data-preset="lut-warm">Тёплый</button>
+          <button class="preset-btn" data-preset="lut-cool">Холодный</button>
+          <button class="preset-btn" data-preset="lut-moody">Мрачный</button>
+          <button class="preset-btn" data-preset="lut-bright">Светлый</button>
+          <button class="preset-btn" data-preset="lut-fade">Выцветший</button>
+          <button class="preset-btn" data-preset="lut-teal">Teal&Orange</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btn-apply-color">
+        <i class="fas fa-play"></i> Применить коррекцию
+      </button>
+    </div>
+
+    <!-- TOOLS TAB -->
+    <div class="tab-content" id="tab-tools">
+      <div class="section">
+        <div class="section-title"><i class="fas fa-bolt"></i> Детализация</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Резкость</span>
+            <span class="slider-value" id="val-sharp">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-sharp" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Шумоподавление</span>
+            <span class="slider-value" id="val-denoise">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-denoise" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Чёткость</span>
+            <span class="slider-value" id="val-clarity">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-clarity" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Текстура</span>
+            <span class="slider-value" id="val-texture">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-texture" />
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><i class="fas fa-circle"></i> Эффекты</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Виньетка</span>
+            <span class="slider-value" id="val-vignette">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-vignette" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Зерно</span>
+            <span class="slider-value" id="val-grain">0</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="slider-grain" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 4px;">
+        <button class="btn btn-secondary" style="flex: 1;" id="btn-reset">
+          <i class="fas fa-undo"></i> Сброс
+        </button>
+        <button class="btn btn-primary" style="flex: 2;" id="btn-apply-all">
+          <i class="fas fa-play"></i> Применить всё
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Готов</span>
+    </div>
+    <span id="status-info">Фотозона Pro v2.0</span>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toast-icon"></i>
+    <span id="toast-text"></span>
+  </div>
+
+  <script src="plugin.js"></script>
+</body>
+</html>
